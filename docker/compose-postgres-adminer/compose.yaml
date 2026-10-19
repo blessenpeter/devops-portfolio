@@ -1,0 +1,13 @@
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql
+  adminer:
+    image: adminer
+    ports:
+      - "8082:8080"
+volumes:
+  pgdata:
