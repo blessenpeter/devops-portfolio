@@ -1,0 +1,33 @@
+# Terraform: AWS VPC (public + private subnet)
+
+Rebuilds, in Terraform, a VPC I first built by hand in the AWS console.
+
+## What it creates (eu-west-2)
+| Resource | Name | Detail |
+|---|---|---|
+| VPC | tf-lab-vpc | 10.0.0.0/16 |
+| Subnet | tf-public-a | 10.0.1.0/24, eu-west-2a |
+| Subnet | tf-private-a | 10.0.2.0/24, eu-west-2a |
+| Internet gateway | tf-igw | attached to the VPC |
+| Route table | tf-public-rt | local + 0.0.0.0/0 → IGW, associated with tf-public-a |
+| Route table | tf-private-rt | local only, associated with tf-private-a |
+
+9 resources in total (including the route and the two associations).
+
+## What I practised
+- **Dependency graph:** no order is written anywhere; Terraform works it out from references (`aws_vpc.main.id`). Apply created the VPC first, then subnets, IGW and route tables in parallel, then the route and associations. Destroy ran in reverse.
+- **Plan / apply / destroy** with predictions before each step.
+- **Idempotency:** a second `plan` after apply reported "No changes".
+- **Drift:** changed a subnet's Name tag in the console; `plan` showed `~ update in-place` back to the value in code, and `apply` corrected it.
+- **Safe setup:** dedicated least-privilege IAM user (`AmazonVPCFullAccess`) via a named CLI profile; no keys in code. State files and `.terraform/` are git-ignored; the lock file is committed.
+
+## Run it
+```bash
+terraform init
+terraform plan
+terraform apply
+terraform destroy   # always destroy after the lab
+```
+
+## Next
+Variables and outputs, then a remote state backend (S3).
