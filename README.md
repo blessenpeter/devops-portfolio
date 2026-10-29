@@ -10,6 +10,7 @@ Hands-on projects covering containers, cloud and automation. Each folder has its
 | [docker/compose-postgres-adminer](docker/compose-postgres-adminer) | Two-service Compose app: PostgreSQL 18 + Adminer; DB reached by service name, only the UI is published, named volume, password kept out of Git via `.env` |
 | [aws/s3-prefix-least-privilege](aws/s3-prefix-least-privilege) | IAM policy limiting S3 read access to one key prefix; bucket vs object ARNs; three IAM policy simulator tests (implicit deny vs explicit allow) |
 | [terraform/vpc-basic](terraform/vpc-basic) | AWS VPC rebuilt in Terraform: public/private subnets, IGW, route tables (9 resources); dependency graph from references, plan/apply/destroy, drift detected and corrected; state git-ignored, lock file committed |
+| [terraform/vpc-web-server](terraform/vpc-web-server) | EC2 web server in Terraform: security group with separate ingress/egress rules (explicit egress), Amazon Linux 2023 AMI found by a data source, nginx installed by user_data, public URL as an output; saved plan applied, `depends_on` for a hidden dependency, tested with curl (HTTP 200), destroyed |
 
 ## Coming next
 - A Python Flask app in Docker
