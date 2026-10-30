@@ -40,5 +40,10 @@ terraform output
 terraform destroy   # always destroy after the lab
 ```
 
+## Remote state
+
+State is stored in S3 (bucket created by `terraform/state-bootstrap`), key `vpc-basic/terraform.tfstate`, with encryption and S3 native locking (`use_lockfile`). See `backend.tf`. Migrated from local state with `terraform init -migrate-state`; `terraform plan` afterwards reported no changes.
+
 ## Next
-Remote state in S3 with locking, then a reusable module.
+
+Turn this VPC into a reusable module.
