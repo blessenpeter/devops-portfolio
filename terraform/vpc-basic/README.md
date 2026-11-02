@@ -12,15 +12,16 @@ Rebuilds, in Terraform, a VPC I first built by hand in the AWS console.
 | Route table | tf-public-rt | local + 0.0.0.0/0 → IGW, associated with tf-public-a |
 | Route table | tf-private-rt | local only, associated with tf-private-a |
 
-9 resources in total (including the route and the two associations).
+9 resources in total (including the route and the two associations), built by the reusable module in `terraform/modules/vpc`. In plans they appear as `module.vpc.<resource>`, e.g. `module.vpc.aws_vpc.main`.
 
 ## Files
 | File | Contains |
 |---|---|
 | `providers.tf` | Terraform and AWS provider versions, region, CLI profile |
 | `variables.tf` | Inputs with defaults: region, project prefix, AZ, CIDR blocks |
-| `main.tf` | The 9 resources, built only from variables and references |
-| `outputs.tf` | VPC ID, subnet IDs and VPC CIDR, handed back after apply |
+| `main.tf` | One `module "vpc"` block: calls `../modules/vpc` and passes in the variables |
+| `outputs.tf` | VPC ID, subnet IDs and VPC CIDR, read from the module (`module.vpc.*`) |
+| `backend.tf` | Remote state in S3 with locking (see "Remote state") |
 
 ## What I practised
 - **Dependency graph:** no order is written anywhere; Terraform works it out from references (`aws_vpc.main.id`). Apply created the VPC first, then subnets, IGW and route tables in parallel, then the route and associations. Destroy ran in reverse.
@@ -44,6 +45,10 @@ terraform destroy   # always destroy after the lab
 
 State is stored in S3 (bucket created by `terraform/state-bootstrap`), key `vpc-basic/terraform.tfstate`, with encryption and S3 native locking (`use_lockfile`). See `backend.tf`. Migrated from local state with `terraform init -migrate-state`; `terraform plan` afterwards reported no changes.
 
+## Module
+
+The VPC code now lives in one reusable module, `terraform/modules/vpc`; this folder is the root module that calls it. Adding or changing a module needs `terraform init` again, which registers it (`- vpc in ../modules/vpc`). Verified with init, plan (9 to add, all `module.vpc.*`), apply, `terraform output` and destroy.
+
 ## Next
 
-Turn this VPC into a reusable module.
+`vpc-web-server` will call the same module instead of keeping its own copy of the VPC code.
