@@ -15,13 +15,15 @@ Reusable Terraform module that builds a basic AWS network: one VPC with a public
 
 ## Inputs
 
-| Name | Description | Default |
-|---|---|---|
-| `project` | Name prefix for every resource | `tf` |
-| `az` | Availability Zone for both subnets | `eu-west-2a` |
-| `vpc_cidr` | CIDR block for the VPC | `10.0.0.0/16` |
-| `public_subnet_cidr` | CIDR block for the public subnet | `10.0.1.0/24` |
-| `private_subnet_cidr` | CIDR block for the private subnet | `10.0.2.0/24` |
+| Name | Description | Required | Example |
+|---|---|---|---|
+| `project` | Name prefix for every resource | yes | `tf` |
+| `az` | Availability Zone for both subnets | yes | `eu-west-2a` |
+| `vpc_cidr` | CIDR block for the VPC | yes | `10.0.0.0/16` |
+| `public_subnet_cidr` | CIDR block for the public subnet | yes | `10.0.1.0/24` |
+| `private_subnet_cidr` | CIDR block for the private subnet | yes | `10.0.2.0/24` |
+
+All inputs are required (no defaults), so each root module chooses its own values.
 
 ## Outputs
 
@@ -38,8 +40,11 @@ Reusable Terraform module that builds a basic AWS network: one VPC with a public
 module "vpc" {
   source = "../modules/vpc"
 
-  project  = "demo"
-  vpc_cidr = "10.0.0.0/16"
+  project             = "demo"
+  az                  = "eu-west-2a"
+  vpc_cidr            = "10.0.0.0/16"
+  public_subnet_cidr  = "10.0.1.0/24"
+  private_subnet_cidr = "10.0.2.0/24"
 }
 ```
 
