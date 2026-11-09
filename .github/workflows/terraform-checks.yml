@@ -1,0 +1,24 @@
+name: Terraform checks
+
+on: pull_request
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copy the repo onto the runner
+        uses: actions/checkout@v7
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.17.0
+
+      - name: Check formatting
+        run: terraform fmt -check -recursive terraform
+
+      - name: Validate vpc-basic
+        working-directory: terraform/vpc-basic
+        run: |
+          terraform init -backend=false
+          terraform validate
