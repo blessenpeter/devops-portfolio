@@ -10,6 +10,5 @@ terraform {
 }
 
 provider "aws" {
-  region  = var.region
-  profile = "terraform-lab"
+  region = var.region
 }

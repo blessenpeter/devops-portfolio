@@ -1,6 +1,9 @@
 name: Terraform checks
-
 on: pull_request
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   check:
@@ -17,8 +20,15 @@ jobs:
       - name: Check formatting
         run: terraform fmt -check -recursive terraform
 
-      - name: Validate vpc-basic
+      - name: Log in to AWS with OIDC
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Validate and plan vpc-basic
         working-directory: terraform/vpc-basic
         run: |
-          terraform init -backend=false
+          terraform init -input=false
           terraform validate
+          terraform plan -input=false
