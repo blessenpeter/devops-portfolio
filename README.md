@@ -13,7 +13,8 @@ Hands-on projects covering containers, cloud and automation. Each folder has its
 | [terraform/vpc-web-server](terraform/vpc-web-server) | EC2 web server in Terraform: security group with separate ingress/egress rules (explicit egress), Amazon Linux 2023 AMI found by a data source, nginx installed by user_data, public URL as an output; saved plan applied, `depends_on` for a hidden dependency, tested with curl (HTTP 200), destroyed |
 | [terraform/state-bootstrap](terraform/state-bootstrap) | Terraform remote state: bootstrap project creates a versioned, encrypted, private S3 state bucket (`prevent_destroy`); vpc-basic migrated with `init -migrate-state` (plan: no changes); S3 native locking shown blocking a second run; old state versions listed for rollback |
 | [terraform/modules/vpc](terraform/modules/vpc) | Reusable Terraform VPC module: inputs as variables, results as outputs, no provider or backend inside; vpc-basic calls it with one `module` block (resources addressed `module.vpc.*`); verified with init, plan, apply, outputs and destroy |
+| [.github/workflows](.github/workflows) | CI/CD with GitHub Actions: every pull request runs `terraform fmt -check`, `validate` and `plan` against AWS; logs in with OIDC (short-lived credentials, no stored keys) through a read-only IAM role that trusts only this repo's pull requests; `main` protected by a ruleset (pull request + passing check required, no force pushes or deletion) |
 
 ## Coming next
-- CI/CD with GitHub Actions
+- Kubernetes on AWS (EKS)
 - A Python Flask app in Docker
