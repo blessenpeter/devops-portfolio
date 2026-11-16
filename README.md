@@ -1,8 +1,9 @@
 # DevOps portfolio
 
-Hands-on projects covering containers, cloud and automation. Each folder has its own README with steps to run it.
+Hands-on AWS and DevOps projects: infrastructure as code, CI/CD, containers and Kubernetes. Each folder has its own README with the steps to run it and the results of testing it.
 
 ## Projects
+
 | Project | What it shows |
 |---|---|
 | [docker/my-web](docker/my-web) | Custom nginx image: Dockerfile, build and tag, port mapping, release and rollback |
@@ -16,6 +17,18 @@ Hands-on projects covering containers, cloud and automation. Each folder has its
 | [.github/workflows](.github/workflows) | CI/CD with GitHub Actions: every pull request runs `terraform fmt -check`, `validate` and `plan` against AWS; logs in with OIDC (short-lived credentials, no stored keys) through a read-only IAM role that trusts only this repo's pull requests; `main` protected by a ruleset (pull request + passing check required, no force pushes or deletion) |
 | [kubernetes/kind-web-app](kubernetes/kind-web-app) | Kubernetes Deployment on a local kind cluster: nginx manifest with 5 replicas and CPU/memory requests and limits; self-healing shown by deleting a pod, scaling by changing `replicas`, and a rolling update to a new image version with the old ReplicaSet kept for rollback |
 
-## Coming next
-- Kubernetes on AWS (EKS)
-- A Python Flask app in Docker
+## How this repository is run
+
+- Every change reaches `main` through a pull request. A ruleset requires the CI check to pass first and blocks direct pushes.
+- CI logs in to AWS with OIDC and short-lived credentials. No access keys are stored in GitHub, and the CI role is read-only.
+- Infrastructure is defined in Terraform, with remote state in S3 (versioned, encrypted and locked).
+- Access follows least privilege, for IAM policies and for the CI role.
+- Each project is tested, the results are recorded in its README, and cloud resources are destroyed afterwards.
+
+## Roadmap
+
+- Kubernetes: a Service and a rollback for the web app, then manifest checks in CI
+- Helm and Argo CD for GitOps deployments, then Amazon EKS built with Terraform
+- Monitoring with Prometheus and Grafana
+- Security scanning in the pipeline
+- An AI agent on AWS, built in Python and run with the same CI/CD and monitoring as any other service
