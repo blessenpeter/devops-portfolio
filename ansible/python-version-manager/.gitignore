@@ -1,0 +1,8 @@
+# Python virtual environment that holds Ansible. Rebuild it with the commands in the README.
+.venv/
+
+# Ansible retry files
+*.retry
+
+# macOS Finder metadata
+.DS_Store
