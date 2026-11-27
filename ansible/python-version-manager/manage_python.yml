@@ -1,0 +1,77 @@
+---
+- name: Manage the default Python version on macOS
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    pyenv_bin: /opt/homebrew/bin/pyenv
+    pyenv_root: "{{ lookup('env', 'HOME') }}/.pyenv"
+
+  environment:
+    PATH: "{{ pyenv_root }}/shims:{{ lookup('env', 'PATH') }}"
+
+  vars_prompt:
+    - name: python_version
+      prompt: "Which Python version do you want (for example 3.12.7)?"
+      private: false
+
+  tasks:
+    - name: Detect the active Python version
+      ansible.builtin.shell: "command -v python >/dev/null 2>&1 && python --version || python3 --version"
+      register: python_before
+      changed_when: false
+
+    - name: Show the Python version before any change
+      ansible.builtin.debug:
+        msg: "Before: {{ python_before.stdout }} | Requested: Python {{ python_version }}"
+
+    - name: Install pyenv with Homebrew
+      community.general.homebrew:
+        name: pyenv
+        state: present
+
+    - name: List the versions that pyenv can install
+      ansible.builtin.command: "{{ pyenv_bin }} install --list"
+      register: pyenv_available
+      changed_when: false
+
+    - name: Stop if the requested version is not in that list
+      ansible.builtin.assert:
+        that:
+          - python_version in (pyenv_available.stdout_lines | map('trim') | list)
+        fail_msg: "'{{ python_version }}' is not a version that pyenv can install. Run 'pyenv install --list' to see the valid versions."
+        success_msg: "pyenv can install {{ python_version }}."
+
+    - name: Install the requested Python version with pyenv
+      ansible.builtin.command: "{{ pyenv_bin }} install {{ python_version }}"
+      args:
+        creates: "{{ pyenv_root }}/versions/{{ python_version }}/bin/python"
+
+    - name: Read the version that pyenv uses as the default
+      ansible.builtin.command: "{{ pyenv_bin }} global"
+      register: pyenv_global
+      changed_when: false
+
+    - name: Make the requested version the default
+      ansible.builtin.command: "{{ pyenv_bin }} global {{ python_version }}"
+      when: pyenv_global.stdout != python_version
+
+    - name: Set up pyenv in the zsh start-up file
+      ansible.builtin.blockinfile:
+        path: "{{ lookup('env', 'HOME') }}/.zshrc"
+        marker: "# {mark} pyenv set-up, managed by Ansible"
+        block: |
+          export PYENV_ROOT="$HOME/.pyenv"
+          [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+          eval "$(pyenv init - zsh)"
+        backup: true
+
+    - name: Read the active Python version after the change
+      ansible.builtin.shell: "python --version"
+      register: python_after
+      changed_when: false
+
+    - name: Show the Python version after the change
+      ansible.builtin.debug:
+        msg: "After: {{ python_after.stdout }}"
