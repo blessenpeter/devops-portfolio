@@ -16,6 +16,7 @@ Hands-on AWS and DevOps projects: infrastructure as code, CI/CD, containers and 
 | [terraform/modules/vpc](terraform/modules/vpc) | Reusable Terraform VPC module: inputs as variables, results as outputs, no provider or backend inside; vpc-basic calls it with one `module` block (resources addressed `module.vpc.*`); verified with init, plan, apply, outputs and destroy |
 | [.github/workflows](.github/workflows) | CI/CD with GitHub Actions: every pull request runs `terraform fmt -check`, `validate` and `plan` against AWS; logs in with OIDC (short-lived credentials, no stored keys) through a read-only IAM role that trusts only this repo's pull requests; `main` protected by a ruleset (pull request + passing check required, no force pushes or deletion) |
 | [kubernetes/kind-web-app](kubernetes/kind-web-app) | Kubernetes Deployment on a local kind cluster: nginx manifest with 5 replicas and CPU/memory requests and limits; self-healing shown by deleting a pod, scaling by changing `replicas`, and a rolling update to a new image version with the old ReplicaSet kept for rollback |
+| [ansible/python-version-manager](ansible/python-version-manager) | Ansible playbook that sets the default Python version on macOS through pyenv: Homebrew and pyenv installs made idempotent with `creates` and `when`, shell set-up written to `~/.zshrc` with `blockinfile`, requested version validated with `assert` before any change; upgrade, downgrade, `changed=0` on a second run and a rejected invalid version shown with screenshots |
 
 ## How this repository is run
 
