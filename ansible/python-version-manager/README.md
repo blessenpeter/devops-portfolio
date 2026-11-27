@@ -59,27 +59,27 @@ The first installation of a version takes a few minutes, because pyenv builds Py
 
 ### Starting point
 
-The Mac has no `python` command, and `python3` is 3.11.1.
+Before the first run, the Mac has no `python` command, and `python3` is 3.11.1.
 
 ![Starting point](screenshots/01-before.png)
 
-### Upgrade to 3.12.7
+### Switch to a version that is not installed yet
 
-The task that sets the default reports `changed`, and the version after the run is 3.12.7.
+3.11.8 is requested while 3.11.18 is the default. Two tasks report `changed`: the installation of 3.11.8 and the change of the default.
 
-![Upgrade](screenshots/02-upgrade.png)
+![Downgrade to 3.11.8](screenshots/02-downgrade.png)
+
+### Switch to a version that is already installed
+
+3.12.7 is requested. It is already installed, so the installation task reports `ok` and only the change of the default reports `changed`.
+
+![Upgrade to 3.12.7](screenshots/03-upgrade.png)
 
 ### A new terminal uses the requested version
 
 `python` is found in pyenv's `shims` folder and is version 3.12.7.
 
-![New terminal](screenshots/03-new-terminal.png)
-
-### Downgrade to 3.11.18
-
-3.11.18 was not installed, so two tasks report `changed`: the installation and the change of the default.
-
-![Downgrade](screenshots/04-downgrade.png)
+![New terminal](screenshots/04-new-terminal.png)
 
 ### Idempotency
 
@@ -93,15 +93,13 @@ A second run with the same version reports `changed=0`. The task that sets the d
 
 ![Invalid version](screenshots/06-invalid-version.png)
 
-The upgrade, downgrade and idempotency screenshots were taken before the inventory file was added, so they show Ansible's two "no inventory" warnings. With `-i inventory.ini` the warnings do not appear, as in the last screenshot.
-
 ## Behaviour by starting state
 
 | Requested | State before the run | `changed` | Work done |
 |---|---|---|---|
 | 3.12.7 | No pyenv lines in `~/.zshrc` | 1 | Block added to `~/.zshrc` |
 | 3.12.7 | Everything already in place | 0 | None |
-| 3.11.18 | Version not installed | 2 | Version installed and made the default |
+| 3.11.8 | Version not installed | 2 | Version installed and made the default |
 | 3.12.7 | Installed, but not the default | 1 | Default switched |
 | 3.99.0 | Any | 0 | None; the play stops at the version check |
 
@@ -116,7 +114,7 @@ The upgrade, downgrade and idempotency screenshots were taken before the invento
 
 ```bash
 pyenv global system          # use the system Python again
-pyenv uninstall 3.11.18      # remove a version that is no longer needed
+pyenv uninstall 3.11.8       # remove a version that is no longer needed
 ```
 
 To stop the shell from using pyenv, delete the marked block from `~/.zshrc` and open a new terminal window.
